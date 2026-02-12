@@ -207,6 +207,43 @@ Agents communicate through GitHub's native features:
 | **Labels** | Categorization and routing | `agent-task`, `security`, `in-progress` |
 | **Linked issues** | Traceability | Worker PR says "Refs #42"; release PR aggregates "Closes #42" |
 
+Canonical reference: `docs/dev/GITHUB_LABELS.md`.
+
+### Issue claiming (exclusive lock)
+
+To prevent duplicate work, issue claiming is treated as a **lock acquisition**.
+
+**Rules:**
+
+- Only the **Director** may claim issues. Workers must never self-claim.
+- Claiming MUST be done by:
+  1) removing `agent-task`
+  2) adding `agent-claimed`
+  3) posting a machine-parseable claim comment
+
+**Claim comment format:**
+
+The comment MUST start with `ReviewCat-Claim:` and include the fields needed for audit + recovery.
+
+Example:
+
+```text
+ReviewCat-Claim:
+  claimed_by: director
+  run_id: <run_id>
+  worker_id: <worker_id>
+  claimed_at: 2026-02-11T23:59:59Z
+  release_branch: feature/release-20260211-235959Z
+```
+
+**Reclaiming a stale claim:**
+
+If a worker is stuck (heartbeat TTL exceeded / no progress for a configured window), the Director may reclaim:
+
+- add a `ReviewCat-Reclaim:` comment explaining why
+- remove `agent-claimed`, re-add `agent-task`
+- optionally apply `agent-blocked` if human input is required
+
 ## Self-Review Loop
 
 The core innovation: ReviewCat reviews itself, generates issues, fixes them,

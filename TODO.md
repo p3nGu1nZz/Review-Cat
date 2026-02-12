@@ -98,6 +98,8 @@ Run `dev/scripts/setup.sh` to automate these, or do them manually:
   - `security`, `performance`, `architecture`, `testing`, `docs`
   - `priority-critical`, `priority-high`, `priority-medium`, `priority-low`
 
+  Reference: `docs/dev/GITHUB_LABELS.md` (taxonomy + lifecycle + claim-lock protocol).
+
 ### 0.3 — Directory Structure & Build Scaffold
 
 - [ ] Create `app/` hierarchy: `src/core/`, `src/cli/`, `src/daemon/`, `src/ui/`, `src/copilot/`, `include/`, `tests/`, `config/`, `scripts/`
@@ -516,6 +518,7 @@ system equivalent to running Claude Code in an autonomous loop.
   - [ ] C++ app: `--log-level` CLI flag (trace/debug/info/warn/error)
   - [ ] C++ app: UI sink for Log Viewer panel (no Dear ImGui dependency)
 - [ ] **Test infrastructure:**
+  - [ ] Reference: `docs/dev/TESTING_STRATEGY.md` (philosophy, conventions, determinism).
   - [ ] `scripts/test.sh` runs Catch2 binary + reports results
   - [ ] Record/replay fixtures for Copilot CLI responses
   - [ ] Golden file tests for demo output

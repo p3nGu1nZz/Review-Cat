@@ -163,7 +163,7 @@ entirely of **shell scripts** and **Copilot CLI agent profiles**:
 | Git ops | **libgit2** + **`git worktree`** | Programmatic git from C++; parallel worktrees for agents |
 | JSON | **nlohmann/json** | De facto C++ JSON library |
 | Config | **TOML** (`reviewcat.toml`) | Human-readable; parsed with `toml++` |
-| Testing | **Catch2** | Mature, header-only C++ test framework |
+| Testing | **Catch2** | Mature, header-only C++ test framework. See `docs/dev/TESTING_STRATEGY.md`. |
 | Logging | **spdlog** | Fast, header-only C++ logging; structured dev harness logs |
 | Package manager | **vcpkg** or git submodules | Dependency management for C++ libs |
 | Distribution | Single static binary + shell | No runtime dependencies for end users |
@@ -597,6 +597,8 @@ All timings and ports live in `config/dev.toml` (see Issue #5).
 | `auto-review` | Created by self-review process |
 | `security` / `performance` / `architecture` / `testing` / `docs` | Persona category |
 | `priority-critical` / `priority-high` / `priority-medium` / `priority-low` | Severity |
+
+For the full label taxonomy, lifecycle diagrams, and the issue-claim lock protocol, see `docs/dev/GITHUB_LABELS.md`.
 
 ### 5.6. Guardrails
 

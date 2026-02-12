@@ -14,6 +14,9 @@ This is intended to be implemented using Copilot CLI custom agents and a thin or
 4. Must record a development audit bundle.
 5. Must operate in release cycles (batch issues into `feature/release-*` and finalize via merge agent).
 6. Must use gitignored `STATE.json` for local cached state (first-run vs resume; active release context).
+7. Must enforce the **issue-claim lock protocol** (Director-only claiming; label transitions + claim comments).
+
+Canonical label taxonomy and claim-comment format: `docs/dev/GITHUB_LABELS.md`.
 
 ## Interfaces
 

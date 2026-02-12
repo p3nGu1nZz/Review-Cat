@@ -23,6 +23,9 @@ This system serves two distinct contexts:
 7. Must support GitHub MCP Server as primary integration.
 8. Must fall back to `gh` CLI if MCP Server is unavailable.
 9. Must respect swarm-level backpressure and rate-limit policy (see `RequestBudgetSystem`).
+10. Must support the Director’s **issue-claim lock protocol** (label transitions + claim comment).
+
+Canonical label taxonomy and claim-comment format: `docs/dev/GITHUB_LABELS.md`.
 
 ## Interfaces
 
@@ -32,6 +35,19 @@ This system serves two distinct contexts:
 - `list_issues(repo, labels, state) -> issues[]`
 - `add_issue_comment(repo, issue_number, body) -> comment_url`
 - `update_issue(repo, issue_number, labels, state) -> void`
+
+#### Director-only lock operations
+
+These operations are conceptually higher-level; they are implemented using the primitives above.
+
+- `claim_issue_lock(repo, issue_number, run_id, worker_id, release_branch?) -> void`
+  - MUST remove `agent-task`
+  - MUST add `agent-claimed`
+  - MUST add a `ReviewCat-Claim:` comment (see `docs/dev/GITHUB_LABELS.md`)
+- `reclaim_issue_lock(repo, issue_number, reason) -> void`
+  - SHOULD add a `ReviewCat-Reclaim:` comment
+  - SHOULD remove `agent-claimed`
+  - SHOULD add `agent-task` (or `agent-blocked` if escalation is required)
 
 ### PR operations (via GitHub MCP Server)
 - `create_pull_request(repo, head, base, title, body) -> pr_number`
@@ -51,6 +67,9 @@ This system serves two distinct contexts:
 - If `gh` is also missing or unauthenticated, system fails gracefully and
   suggests `gh auth login`.
 - Created issues have correct labels from the label taxonomy.
+- Issue claiming uses the lock protocol:
+  - label transitions are correct (`agent-task` -> `agent-claimed`)
+  - claim comment is present and machine-parseable
 - Created PRs link issues for traceability:
   - worker PRs use `Refs #N`
   - release PRs aggregate `Closes #...` so issues close on merge to `main`.
