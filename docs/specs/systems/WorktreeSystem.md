@@ -6,6 +6,11 @@
 Each coding agent or implementer works in an isolated worktree so that
 multiple agents can compile, test, and commit independently without conflicts.
 
+In the Docker-first dev harness:
+
+- **worktrees** provide *workspace isolation* (branches, build dirs, artifacts)
+- **containers** provide *process/toolchain isolation* (dependencies, runtime)
+
 Worktrees are created in the parent directory of the main repository.
 
 ## Requirements
@@ -18,6 +23,10 @@ Worktrees are created in the parent directory of the main repository.
 6. Must handle cleanup of orphaned worktrees on Director restart.
 7. Must tolerate the presence of a gitignored root `STATE.json` file inside worktrees.
 8. Must never treat `STATE.json` as durable coordination (it is local cached state only).
+
+9. Must support Docker-first execution by ensuring each worker worktree can be:
+    - bind-mounted into a worker container at the path configured by `config/dev.toml` (`[containers].workdir`, default `/workspace`)
+    - used as the container working directory for that worker
 
 ## Interfaces
 
@@ -92,3 +101,15 @@ Recommended minimum fields for `STATE.json` are defined in:
 - Worktree names must be deterministic for debugging.
 - No worktree should modify the main checkout.
 - Cleanup must be safe (never delete the main worktree).
+
+## Notes (containers)
+
+`WorktreeSystem` does not manage Docker containers directly, but its outputs are consumed by the Director’s container lifecycle logic:
+
+- create worktree → start worker container with worktree bind-mounted
+- merge/teardown → stop/remove container → remove worktree
+
+See:
+
+- `docs/specs/agents/DirectorDevAgent.md`
+- `docs/DIRECTOR_DEV_WORKFLOW.md`

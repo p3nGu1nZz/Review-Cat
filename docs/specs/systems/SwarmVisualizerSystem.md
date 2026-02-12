@@ -15,8 +15,11 @@ The visualizer is intended to run on the operator’s machine (Windows or Linux)
 ### Functional requirements
 
 1. **Connect/disconnect**
-   - Connect to agent bus endpoint (host/port) defined by `config/dev.toml`.
+  - Connect to agent bus endpoint (host/port) defined by `config/dev.toml` (`[agent_bus].listen_addr` / `[agent_bus].listen_port`).
    - Show connection status and last-received message time.
+  - Participate in agent-bus version negotiation (see `AgentBusSystem`):
+    - send `protocol_hello.v1` as `sender.role = operator`
+    - expect `protocol_welcome.v1` (or handle `protocol_incompatibility.v1`)
 
 2. **Live swarm graph rendering (3D)**
    - Render nodes for:
@@ -71,11 +74,16 @@ The visualizer is intended to run on the operator’s machine (Windows or Linux)
 
 ### Inputs
 
-- Agent bus messages (pub/sub). At minimum:
-  - heartbeats
-  - structured errors
-  - worker lifecycle events
-  - ProjectState snapshots
+- Agent bus messages (framed + enveloped). At minimum (message types defined in `docs/specs/systems/AgentBusSystem.md`):
+  - `heartbeat.v1`
+  - `worker_error.v1`
+  - `project_state_snapshot.v1`
+
+  Optional-but-useful for richer UI:
+
+  - `protocol_hello.v1` / `protocol_welcome.v1` (connection/debug panels)
+  - `sync_required.v1` / `protocol_incompatibility.v1` (drift/compat alerts)
+  - `engram_announce.v1` / `engram_catalog_snapshot.v1` (memory activity panels)
 
 ### Outputs
 
@@ -86,6 +94,7 @@ The visualizer is intended to run on the operator’s machine (Windows or Linux)
 
 - Reads:
   - agent bus address/ports from `config/dev.toml`
+  - heartbeat TTL from `config/dev.toml` (`[timeouts].worker_heartbeat_ttl_seconds`) for “stale worker” UI state
   - optional UI defaults (camera speed, theme) from a UI config section (future)
 
 ## Acceptance criteria
@@ -113,5 +122,5 @@ The visualizer is intended to run on the operator’s machine (Windows or Linux)
 
 ## Notes
 
-- This spec assumes the existence of an agent bus and ProjectState DTOs (see planning issues for agent-bus/control-plane design).
+- This spec assumes the existence of an agent bus and ProjectState DTOs; canonical message types and envelope framing are defined in `docs/specs/systems/AgentBusSystem.md`.
 - The visualizer is an operator tool for the dev harness first; it may later be integrated into the runtime app UI if it remains valuable.

@@ -134,6 +134,19 @@ The **dev harness** (once implemented) assumes a Docker-capable environment
 (Linux, or Windows + WSL2 + Docker Desktop integration): one shared image tag,
 many worker containers, one git worktree mounted per worker.
 
+Recommended host health checks:
+
+- `docker version`
+- `docker info`
+- `docker run --rm hello-world`
+
+GitHub integration for agents is via the GitHub MCP Server. Example MCP configs live in `dev/mcp/`:
+
+- `dev/mcp/github-mcp.json` (remote HTTP MCP; preferred MVP)
+- `dev/mcp/github-mcp-stdio.json` (local stdio binary; fallback/offline)
+
+Secrets (PATs) are provided via environment variables. See `.env.example` and `docs/dev/ENVIRONMENT.md`.
+
 The Director’s scheduling, timeouts, worker telemetry, and agent-bus networking are configured via `config/dev.toml`.
 
 Project memory is shared in two layers (see `AGENT.md` and Issue #13):

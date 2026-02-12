@@ -70,7 +70,8 @@ In Copilot CLI, these roles are expressed as custom agents:
   `code-review.md`).
 - All agents are invoked via `copilot -p @dev/agents/<role>.md "..."`.
 - Agents use the **GitHub MCP Server** for issue/PR operations when configured
-  with `--mcp-config github-mcp.json`.
+  with `--mcp-config dev/mcp/github-mcp.json` (remote HTTP MCP; preferred MVP)
+  or `--mcp-config dev/mcp/github-mcp-stdio.json` (local stdio fallback).
 
 All development tooling is **bash shell scripts** under `dev/`.
 No C++ compilation is required for the dev harness to operate.

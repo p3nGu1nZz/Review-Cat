@@ -16,6 +16,13 @@ This is intended to be implemented using Copilot CLI custom agents and a thin or
 6. Must use gitignored `STATE.json` for local cached state (first-run vs resume; active release context).
 7. Must enforce the **issue-claim lock protocol** (Director-only claiming; label transitions + claim comments).
 
+7.1 Must manage Docker-first worker execution:
+  - use **one shared image tag** for Director + all workers (no per-agent images)
+  - start **one worker container per task** with the worker worktree bind-mounted as the container workspace
+  - stop/remove idle worker containers (scale-to-zero)
+
+  Container/image/workdir settings are configured via `config/dev.toml` (`[containers]`).
+
 8. Must maintain a worker registry and enforce telemetry invariants:
   - workers must send periodic heartbeats (TTL enforced)
   - workers must report stage/progress and structured errors
@@ -61,7 +68,8 @@ prompt files, invoked via `copilot -p @dev/agents/<role>.md "..."`.
 - Scope control: DirectorDev must refuse to expand scope beyond spec unless explicitly authorized.
 - Safety: no network actions without opt-in.
 - Logging: every heartbeat iteration logged via `dev/harness/log.sh`.
-- MCP Server is configured via either remote MCP or a native `github-mcp-server stdio` binary (host or container-bundled).
+- MCP Server is configured via either remote HTTP MCP or a native `github-mcp-server stdio` binary (host or container-bundled).
+  Example MCP configs live under `dev/mcp/`. See `docs/dev/ENVIRONMENT.md`.
 
 ## References
 

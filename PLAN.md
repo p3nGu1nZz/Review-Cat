@@ -167,6 +167,7 @@ entirely of **shell scripts** and **Copilot CLI agent profiles**:
 | Logging | **spdlog** | Fast, header-only C++ logging; structured dev harness logs |
 | Package manager | **vcpkg** or git submodules | Dependency management for C++ libs |
 | Distribution | Single static binary + shell | No runtime dependencies for end users |
+| Dev harness | **Bash shell scripts** + **Docker** | Docker-first Director/worker orchestration; one shared image tag, many containers; structured logs; easy automation and audit trail |
 
 ### 3.1. GitHub MCP Server
 
@@ -195,23 +196,25 @@ The dev harness may run inside Docker (WSL2-friendly). In that model, you can:
 - use the **remote** MCP server (simplest), or
 - bundle/mount the native `github-mcp-server` binary into the container image.
 
-**MCP config for native binary (`dev/mcp/github-mcp.json`):**
+This repo keeps example MCP config files under:
+
+- `dev/mcp/github-mcp.json` — **remote HTTP MCP** (preferred MVP)
+- `dev/mcp/github-mcp-stdio.json` — **local stdio** `github-mcp-server` binary (fallback/offline)
+
+**MCP config for native binary (`dev/mcp/github-mcp-stdio.json`):**
 
 ```json
 {
   "mcpServers": {
     "github": {
       "command": "/usr/local/bin/github-mcp-server",
-      "args": ["stdio"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
-      }
+      "args": ["stdio"]
     }
   }
 }
 ```
 
-**MCP config for remote server:**
+**MCP config for remote server (`dev/mcp/github-mcp.json`):**
 
 ```json
 {
@@ -384,6 +387,8 @@ while true; do
     if [ -z "$ISSUES" ] && [ -z "$BACKLOG" ]; then
         ./dev/harness/review-self.sh
     fi
+            Authentication for the stdio server is provided via environment variables (never commit secrets).
+            See `.env.example` and `docs/dev/ENVIRONMENT.md`.
 
     # 7. Sleep
     sleep "$INTERVAL"

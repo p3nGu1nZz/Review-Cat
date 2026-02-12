@@ -81,6 +81,19 @@ Recommended minimum fields (schema is intentionally flexible for MVP):
 
 ## Release finalization (merge agent)
 
+## Release readiness (Director decision)
+
+The Director SHOULD consider a release “ready to finalize” when:
+
+1. All issues in the active release plan are either:
+  - merged into the release branch, or
+  - explicitly deferred with a written reason (comment/label), and removed from the release plan.
+2. The release branch is green on the validation gate(s) (build/test once those exist).
+3. There are no active workers still targeting the release branch (or they are at a safe checkpoint).
+4. The Director has recorded the intended image tag for this release (single shared image tag) and can broadcast it after merge.
+
+This is intentionally conservative: prefer fewer, well-validated releases over frequent churn.
+
 When the release plan is complete, the Director invokes a dedicated
 **merge agent expert**.
 
@@ -119,4 +132,4 @@ When `release_published` is broadcast:
 - `AGENT.md` (swarm contract)
 - `docs/DIRECTOR_DEV_WORKFLOW.md` (workflow)
 - `docs/specs/systems/OrchestrationFSMSystem.md` (state machines)
-- GitHub Issue: Docker image lifecycle + release updates (planning)
+- GitHub Issue: #14 (Docker image lifecycle + release updates)

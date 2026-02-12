@@ -29,8 +29,10 @@ Run `dev/scripts/setup.sh` to automate these, or do them manually:
 - [ ] Authenticate gh CLI: `gh auth login` (select HTTPS, `repo` scope, confirm with browser)
 - [ ] Install **jq**: `sudo apt install jq` → `jq --version`
 - [ ] Install/verify **Docker** (dev harness runtime; WSL2-friendly):
-  - `docker --version`
-  - `docker compose version`
+  - `docker version`
+  - `docker info`
+  - `docker run --rm hello-world`
+  - `docker compose version` (optional)
   - Verify non-root usage (or document `sudo docker ...` if required)
 - [ ] Verify **cmake**: `cmake --version` (already installed)
 - [ ] Verify **g++**: `g++ --version` (already installed)
@@ -51,7 +53,7 @@ Run `dev/scripts/setup.sh` to automate these, or do them manually:
   ```
 - [ ] Verify MCP server: `github-mcp-server --help`
 - [ ] Create a GitHub **Personal Access Token** (PAT) with `repo` scope
-- [ ] Export PAT: `export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_...` (add to `~/.bashrc`)
+- [ ] Store PAT in your local `.env` (copy from `.env.example`; never commit `.env`)
 - [ ] Verify Copilot CLI works: `copilot -p "Say hello and confirm you can see this prompt"`
 - [ ] Verify gh works: `gh issue list --repo p3nGu1nZz/Review-Cat`
 
@@ -65,24 +67,32 @@ Run `dev/scripts/setup.sh` to automate these, or do them manually:
 ### 0.2 — GitHub MCP Server Configuration (gives agents GitHub superpowers)
 
 - [ ] Verify `github-mcp-server` is installed (from setup.sh)
-- [ ] Create `dev/mcp/github-mcp.json` — MCP config file:
-  ```json
-  {
-    "mcpServers": {
-      "github": {
-        "command": "github-mcp-server",
-        "args": ["stdio", "--toolsets", "issues,pull_requests,repos,git"],
-        "env": {
-          "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+- [ ] Verify MCP config files exist under `dev/mcp/`:
+  - `dev/mcp/github-mcp.json` — remote HTTP MCP (preferred MVP)
+    ```json
+    {
+      "mcpServers": {
+        "github": {
+          "type": "http",
+          "url": "https://api.githubcopilot.com/mcp/"
         }
       }
     }
-  }
-  ```
-  > **Note:** For the MVP, prefer the **remote MCP server** (`{"type": "http", "url": "https://api.githubcopilot.com/mcp/"}`)
-  > to minimize host/container setup complexity. If you run the native stdio MCP server,
-  > it can live on the host OR inside the dev harness container image — either way, agents
-  > only need a working MCP config.
+    ```
+  - `dev/mcp/github-mcp-stdio.json` — local `github-mcp-server` (fallback/offline)
+    ```json
+    {
+      "mcpServers": {
+        "github": {
+          "command": "github-mcp-server",
+          "args": ["stdio"]
+        }
+      }
+    }
+    ```
+
+  > For stdio mode, provide auth via env (`GITHUB_PERSONAL_ACCESS_TOKEN`) and optionally filter toolsets via `GITHUB_TOOLSETS`.
+  > See `.env.example` and `docs/dev/ENVIRONMENT.md`.
 - [ ] Smoke-test MCP read: `copilot -p "List open issues on p3nGu1nZz/Review-Cat using GitHub MCP tools" --mcp-config dev/mcp/github-mcp.json`
 - [ ] Smoke-test MCP write: `copilot -p "Create a GitHub Issue titled '[test] MCP smoke test' with body 'Delete me' on p3nGu1nZz/Review-Cat" --mcp-config dev/mcp/github-mcp.json`
 - [ ] Close/delete the smoke-test issue
