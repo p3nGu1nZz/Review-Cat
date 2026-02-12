@@ -33,6 +33,7 @@ Repository-level agent profiles live in:
 | `docs` | Documentation | Maintains README, examples, specs |
 | `security` | Security auditor | Enforces safe defaults, redaction, permissions |
 | `code-review` | Code reviewer | Reviews PR diffs, blocks low-signal changes |
+| `merge-expert` | Release merge agent | Merges release PRs into `main`, resolves conflicts, verifies tag |
 
 Each agent profile should specify:
 

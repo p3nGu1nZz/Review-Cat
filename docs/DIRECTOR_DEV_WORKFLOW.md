@@ -19,6 +19,7 @@ other continuously.
 > containers) to keep the system cheap when idle.
 
 > **See also:** [PLAN.md](../PLAN.md) §5 for heartbeat architecture,
+> [AGENT.md](../AGENT.md) for the swarm operating contract,
 > [TODO.md](../TODO.md) Phase 0–1 for implementation tasks, and
 > [COPILOT_CLI_CHALLENGE_DESIGN.md](COPILOT_CLI_CHALLENGE_DESIGN.md) for full
 > design context.
@@ -51,6 +52,7 @@ DirectorDev coordinates these roles:
 - **Docs**: maintains README, examples, prompt cookbook.
 - **Security**: enforces safe defaults, redaction, permission policy.
 - **Code-review**: reviews diffs and blocks low-signal changes.
+- **Merge expert**: finalizes releases by merging the release PR into `main`.
 
 In Copilot CLI, these roles are expressed as custom agents:
 
@@ -81,7 +83,9 @@ No C++ compilation is required for the dev harness to operate.
 - Code changes implementing the spec or fixing the issue.
 - Tests proving acceptance criteria.
 - Updated docs.
-- GitHub PRs linking source issues (`Closes #N`).
+- GitHub PRs linking source issues:
+  - worker PRs use `Refs #N`
+  - the release PR aggregates `Closes #N` so issues close when merged to `main`
 - GitHub Issue status updates (labels, comments).
 - A development audit bundle under `dev/audits/<audit_id>/`:
   - `ledger/` — prompt/response pairs per agent
@@ -96,6 +100,9 @@ The Director also logs each heartbeat to `dev/audits/director.log`.
 ## Orchestration Algorithm
 
 The Director runs as a **bash heartbeat daemon** (`dev/harness/director.sh`).
+For day-to-day operation we recommend a keep-alive supervisor wrapper
+(`dev/harness/daemon.sh`) that restarts the Director cleanly and coordinates
+upgrade safe points.
 See [PLAN.md](../PLAN.md) §5 for the full heartbeat loop pseudocode.
 
 ### Per-Heartbeat Algorithm
@@ -104,26 +111,28 @@ See [PLAN.md](../PLAN.md) §5 for the full heartbeat loop pseudocode.
   - branch: `feature/release-<release_id>`
   - PR: `feature/release-<release_id>` → `main`
   - store `{release_id, branch, pr_number}` in `STATE.json`
+  - if a **new release cycle** begins, archive the previous `TODO.md` into
+    `/archive/` (see `AGENT.md` and the TODO lifecycle note in `TODO.md`)
 2. **Scan GitHub** — List open issues labeled `agent-task` via GitHub MCP.
 3. **Check PRD** — Read `dev/plans/prd.json` for spec-driven work.
 4. **Select release batch** — Decide which issues are in-scope for the current release.
 5. **Check capacity** — Count active worktrees vs `MAX_WORKERS`.
 6. **Claim issues** — For each unclaimed issue within capacity, add
-   `agent-claimed` label via GitHub MCP.
+  `agent-claimed` label via GitHub MCP.
 7. **Dispatch workers** — For each claimed issue:
-   - Create worktree via `dev/harness/worktree.sh create`.
-  - Start a worker container that executes `dev/harness/run-cycle.sh <issue> <branch>`
-    with the worktree bind-mounted as the container workspace.
-  - Pass the active release branch name so worker PRs target the release branch.
-6. **Monitor workers** — Via `dev/harness/monitor-workers.sh`:
-   - Check completed worktrees.
-  - Ingest worker heartbeats/status from the agent bus (real-time state).
-  - Correlate with Docker container state (running/exited/exit code).
-  - Validate build/test in completed worktrees.
-  - Agent creates PR via GitHub MCP targeting the active release branch.
-   - Code-review agent reviews PR.
-  - On pass: merge PR into the release branch, teardown worktree.
-   - On fail: retry (max 3), label `agent-blocked`.
+  - create worktree via `dev/harness/worktree.sh create`
+  - start a worker container that executes `dev/harness/run-cycle.sh <issue> <branch>`
+    with the worktree bind-mounted as the container workspace
+  - pass the active release branch name so worker PRs target the release branch
+8. **Monitor workers** — Via `dev/harness/monitor-workers.sh`:
+  - check completed worktrees
+  - ingest worker heartbeats/status from the agent bus (real-time state)
+  - correlate with Docker container state (running/exited/exit code)
+  - validate build/test in completed worktrees
+  - worker creates PR via GitHub MCP targeting the active release branch
+  - code-review agent reviews PR
+  - on pass: merge worker PR into the release branch, teardown worktree
+  - on fail: retry (max 3), label `agent-blocked`
 
 Real-time worker state is also emitted onto the agent bus. That telemetry is
 intended to power an optional **swarm visualizer** client (SDL3-based) that can
@@ -154,12 +163,8 @@ render a live task graph and provide operator controls (start/stop/pause).
   - this pulls in updated specs/protocols
   - this pulls in newly merged engrams under `/memory/` (durable shared memory)
 5. **Validate** — `./scripts/build.sh && ./scripts/test.sh`.
-6. **Create PR** — Via GitHub MCP with `Closes #<issue>`.
-
-For release-oriented development, workers should instead:
-
-- target the active release branch
-- use `Refs #<issue>` (the release PR is what closes issues on merge to `main`)
+6. **Create PR** — Via GitHub MCP targeting the active release branch and using
+   `Refs #<issue>` (the release PR is what closes issues on merge to `main`).
 7. **Record audit** — Bundle all artifacts.
 
 If the swarm is over memory budget, the Director may also schedule a memory-maintenance task:
@@ -200,7 +205,7 @@ Agents communicate through GitHub's native features:
 | **PRs** | Code implementations | Coder agent creates PR fixing issue |
 | **PR comments** | Review feedback | Code-review agent comments on PR |
 | **Labels** | Categorization and routing | `agent-task`, `security`, `in-progress` |
-| **Linked issues** | Traceability | PR description says "Closes #42" |
+| **Linked issues** | Traceability | Worker PR says "Refs #42"; release PR aggregates "Closes #42" |
 
 ## Self-Review Loop
 
@@ -226,7 +231,7 @@ When a review finding is promoted to a GitHub Issue, the Coder agent:
 4. **Implements the fix** — C++17/20 code following project conventions.
 5. **Writes tests** — Catch2 test cases validating the fix.
 6. **Runs build + test** — validates everything compiles and passes.
-7. **Creates a PR** — via GitHub MCP, `Closes #<issue>`.
+7. **Creates a PR** — via GitHub MCP, `Refs #<issue>` (issues close when the release PR merges to `main`).
 8. **Requests review** — adds `agent-review` label.
 
 ## Bootstrap Sequence
@@ -237,8 +242,11 @@ To cold-start the Director for the first time:
 cd Review-Cat
 ./dev/scripts/setup.sh        # Install prereqs (gh, jq, github-mcp-server)
 ./dev/scripts/bootstrap.sh    # Configure MCP, create issues, verify build
-./dev/harness/director.sh     # Start the Director daemon (loops indefinitely)
+./dev/harness/daemon.sh       # Start supervisor + Director (recommended)
 ```
+
+(`dev/harness/director.sh` remains the underlying heartbeat loop; `daemon.sh`
+adds keep-alive + upgrade coordination.)
 
 ## Guardrails
 
@@ -289,7 +297,7 @@ self-improvement of the ReviewCat codebase.
 
 - Run one small DirectorDev cycle:
   ```bash
-  ./dev/harness/director.sh  # or run a single cycle manually
+  ./dev/harness/daemon.sh  # or run a single cycle manually
   ```
 - Show:
   - the spec file or GitHub Issue being implemented

@@ -116,7 +116,8 @@ Workers execute a **single task cycle** for an issue.
 - `COMMIT`
   - git add/commit with message and traceability
 - `PR_CREATE`
-  - create PR, link issue (Closes #N)
+  - create PR, link issue (`Refs #N`)
+  - worker PRs must not auto-close issues; the active release PR aggregates `Closes #...`
 - `REVIEW_REQUEST`
   - invoke code-review agent / apply labels
 - `DONE`

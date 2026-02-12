@@ -177,7 +177,9 @@ Summary behavior:
 5. Issue creation and coding agent dispatch
    - For critical/high findings, create GitHub Issues via GitHub MCP Server.
    - Dispatch coding agents to worktrees to implement fixes.
-   - Coding agents create PRs linking back to the issues (`Closes #N`).
+  - Coding agents create worker PRs that reference issues (`Refs #N`) and target
+    the active release branch; the release PR aggregates `Closes #...` when it
+    merges to `main`.
 
 6. Persist audit
    - Write `audit.json`.
@@ -368,7 +370,7 @@ Multiple agents work simultaneously in isolated git worktrees:
 | **PRs** | Code implementations | Coder agent creates PR fixing issue |
 | **PR comments** | Review feedback | Code-review agent comments on PR |
 | **Labels** | Categorization and routing | `agent-task`, `security`, `in-progress` |
-| **Linked issues** | Traceability | PR description says "Closes #42" |
+| **Linked issues** | Traceability | Worker PR says "Refs #42"; release PR aggregates "Closes #..." |
 
 **Label taxonomy:**
 
@@ -403,7 +405,8 @@ The Director daemon runs continuously with a configurable interval:
 7. **PR** — Agent creates PR via GitHub MCP, linking the issue.
 8. **Review** — Code-review agent reviews the PR via GitHub MCP.
 9. **Validate** — Run `./scripts/build.sh && ./scripts/test.sh` in worktree.
-10. **Merge** — If validation passes, merge PR and close issue.
+10. **Merge** — If validation passes, merge the worker PR into the active release
+  branch.
 11. **Teardown** — Remove worktree.
 12. **Self-review** — When idle, review own code and create new issues.
 13. **Sleep** — Wait for next heartbeat interval.
@@ -416,7 +419,7 @@ To cold-start the Director for the first time:
 cd Review-Cat
 ./dev/scripts/setup.sh        # Install system prereqs (gh, jq, github-mcp-server)
 ./dev/scripts/bootstrap.sh    # Configure MCP, create issues, verify build
-./dev/harness/director.sh     # Start the Director daemon (loops indefinitely)
+./dev/harness/daemon.sh       # Start keep-alive supervisor (starts Director loop)
 ```
 
 `setup.sh` installs:

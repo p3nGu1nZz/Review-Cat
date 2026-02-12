@@ -18,7 +18,9 @@ GitHub MCP Server configured for issue/PR operations.
 4. Must implement a fix that addresses the issue description.
 5. Must write tests that validate the fix (Catch2 for C++, or appropriate for the change).
 6. Must ensure `./scripts/build.sh && ./scripts/test.sh` pass before creating a PR.
-7. Must create a PR via GitHub MCP Server with `Closes #<issue>` in the body.
+7. Must create a PR via GitHub MCP Server linking the issue:
+  - worker PRs SHOULD use `Refs #<issue>` (issues close when the release PR is merged to `main`)
+  - if release cycles are disabled and the PR targets `main` directly, the PR MAY use `Closes #<issue>`
 8. Must add the `agent-review` label to the PR to trigger code-review.
 9. Must record all Copilot CLI interactions in the prompt ledger.
 
@@ -43,7 +45,7 @@ GitHub MCP Server configured for issue/PR operations.
 6. **Build and test** — Run `./scripts/build.sh && ./scripts/test.sh`.
 7. **Commit** — `git add -A && git commit -m "fix(#<issue>): <description>"`.
 8. **Push** — `git push origin fix/<issue>-<short-desc>`.
-9. **Create PR** — Via GitHub MCP: title `fix(#<issue>): <desc>`, body `Closes #<issue>`.
+9. **Create PR** — Via GitHub MCP: title `fix(#<issue>): <desc>`, body `Refs #<issue>`.
 10. **Label PR** — Add `agent-review` label to trigger code-review agent.
 
 ## Acceptance criteria
@@ -53,14 +55,14 @@ GitHub MCP Server configured for issue/PR operations.
   - Coder produces tests that validate the fix.
   - Build and test pass in the worktree.
   - A PR is created via GitHub MCP linking the issue.
-  - The PR includes `Closes #<issue>` for auto-close on merge.
+  - The PR includes `Refs #<issue>` (the release PR is responsible for closing issues on merge to `main`).
 
 ## Test cases
 
 - Replay mode: given a fixture issue and canned Copilot responses, verify
   the agent creates the expected files and PR.
 - Verify branch naming convention is followed.
-- Verify PR body contains `Closes #<issue>`.
+- Verify PR body contains `Refs #<issue>`.
 
 ## Edge cases
 

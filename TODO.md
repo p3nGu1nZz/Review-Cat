@@ -341,7 +341,7 @@ interruptions (container restarts, transient failures) and coordinating
   - [ ] Create initial GitHub Issues for remaining Phase 0 items
   - [ ] Run `./scripts/build.sh` to verify C++ scaffold compiles
   - [ ] Run `dev/harness/review-self.sh` to seed first issues
-  - [ ] Print: "Bootstrap complete. Run: ./dev/harness/director.sh"
+  - [ ] Print: "Bootstrap complete. Run: ./dev/harness/daemon.sh"
 
 ### 0.10 — Initial Backlog & First Issues
 
@@ -392,13 +392,13 @@ system equivalent to running Claude Code in an autonomous loop.
   - [ ] Agent implements fix in worktree
   - [ ] Agent writes tests for the fix
   - [ ] Agent runs build + test
-  - [ ] Agent creates PR via GitHub MCP (`Closes #<issue>`)
+  - [ ] Agent creates PR via GitHub MCP targeting the active release branch
+  - [ ] Agent links the issue with `Refs #<issue>` (release PR closes issues)
   - [ ] Agent adds `agent-review` label for code-review
 - [ ] Implement Director merge logic:
   - [ ] Code-review agent reviews PR
   - [ ] Director validates build/test pass
-  - [ ] Director merges PR
-  - [ ] Director closes linked issue
+  - [ ] Director merges worker PR into the active release branch
   - [ ] Director tears down worktree
 - [ ] Verify circular loop: review → issue → fix → PR → merge → review
 - [ ] Director runs indefinitely, self-improving the codebase

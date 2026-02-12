@@ -94,10 +94,25 @@ Prompt pattern:
   - role assignments
   - exact acceptance criteria mapping
 
+### Planning issue checklist (governance)
+
+When creating or updating a **planning** GitHub Issue that changes swarm behavior
+(workflow, protocols, roles, orchestration, memory model), include an explicit
+checklist item:
+
+- **[ ] Update `AGENT.md` contract** (and keep it consistent with the relevant specs)
+
+In practice, swarm-behavior changes usually also require updating one or more of:
+
+- the relevant spec(s) under `docs/specs/`
+- `PLAN.md` / `TODO.md` if the change affects phases, workflow, or release tasks
+- `docs/DIRECTOR_DEV_WORKFLOW.md` if it changes how the Director/workers operate
+
 ## DirectorDev Heartbeat Prompts
 
-The Director daemon (`dev/harness/director.sh`) uses these prompt patterns
-when delegating to role agents:
+The Director (recommended entry: `dev/harness/daemon.sh`; underlying loop:
+`dev/harness/director.sh`) uses these prompt patterns when delegating to role
+agents:
 
 ### Implementer
 

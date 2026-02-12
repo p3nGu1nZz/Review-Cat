@@ -39,7 +39,7 @@ runtime app (fixing issues on user repos).
 
 - Given a GitHub Issue, produces code changes and a PR.
 - Build and test pass before PR creation.
-- PR body contains `Closes #<issue>`.
+- PR body contains `Refs #<issue>` (issue closure is handled by the release PR when merged to `main`).
 - Prompt ledger records all coding agent interactions.
 
 ## Test cases

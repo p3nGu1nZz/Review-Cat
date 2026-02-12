@@ -51,7 +51,9 @@ This system serves two distinct contexts:
 - If `gh` is also missing or unauthenticated, system fails gracefully and
   suggests `gh auth login`.
 - Created issues have correct labels from the label taxonomy.
-- Created PRs link issues with `Closes #N` syntax.
+- Created PRs link issues for traceability:
+  - worker PRs use `Refs #N`
+  - release PRs aggregate `Closes #...` so issues close on merge to `main`.
 
 ## Test cases
 
