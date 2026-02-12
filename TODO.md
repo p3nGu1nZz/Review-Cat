@@ -407,7 +407,7 @@ system equivalent to running Claude Code in an autonomous loop.
 - [ ] Verify: Agent created a PR via GitHub MCP (PR visible on GitHub)
 - [ ] Verify: Code-review agent posted a review comment on the PR
 - [ ] Verify: Director merged the worker PR into the active release branch
-- [ ] Verify: Merge agent merged the release PR into `main` (or flagged for human review)
+- [ ] Verify: Merge agent merged the release PR into `main` (or escalated via `agent-blocked` with context)
 - [ ] Verify: Director tore down the worktree after merge
 - [ ] Verify: Audit bundle exists under `dev/audits/` with ledger files
 - [ ] Run `dev/harness/review-self.sh` independently — verify it creates ≥1 issue

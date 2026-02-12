@@ -40,6 +40,20 @@ This runs continuously while the daemon is active, enabling ReviewCat to
 bootstrap from minimal hardcoded logic and progressively develop itself into a
 full product.
 
+### 1.0. Human interaction model (autonomy by default)
+
+Default behavior is **zero-touch autonomous**: the Director runs indefinitely
+and advances the loop without waiting for humans or interactive prompts.
+
+Humans can still interact in three supported ways:
+
+1. **Steering (optional):** create issues, comments, and labels to guide
+  priority/scope.
+2. **Blocked escalation:** when an agent cannot proceed safely/clearly, it
+  applies `agent-blocked` and posts a structured context comment.
+3. **Stop/pause (operational):** stop the Director (or Director container) to
+  halt work.
+
 ### 1.1. Self-First MVP Strategy
 
 The MVP focuses on ReviewCat reviewing and developing **itself** before
@@ -630,6 +644,10 @@ For the full label taxonomy, lifecycle diagrams, and the issue-claim lock protoc
 - **PR-gated merges** — All changes go through PRs, never direct main commits.
 - **Label-based claiming** — Agents claim issues before starting work to avoid
   duplicate effort across parallel workers.
+
+These guardrails are **automated** (they are not human approval checkpoints).
+If the system cannot proceed safely/clearly under the guardrails, it must
+escalate via `agent-blocked` with a clear next action.
 
 ### 5.7. Setup & Bootstrap Sequence
 
