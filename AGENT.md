@@ -82,6 +82,15 @@ Workers must also stay reasonably up to date with `main` while they work:
 	**merge/rebase** the latest `main` into its PR branch (Director policy),
 	to pull in any new specs, protocol changes, and committed memory engrams.
 
+To prevent drift, workers SHOULD include the following fields in their
+heartbeats (see `docs/specs/systems/AgentBusSystem.md`):
+
+- `main_ancestor_sha` (merge-base of worker branch and `main`)
+- `catalog_hash_seen` (hash of `memory/catalog.json`)
+
+The Director enforces thresholds from `config/dev.toml` `[policy.sync_main]` by
+sending `sync_required` and, for hard incompatibilities, `protocol_incompatibility`.
+
 ### Role agents (within a worker)
 
 Within a worker’s task cycle, the worker invokes role agents (Implementer/Coder, QA, Docs, Security, Code-Review) via Copilot CLI prompts.
@@ -124,6 +133,22 @@ Each repo checkout (including worker worktrees) may contain a root-level
 
 `STATE.json` is an optimization and resilience mechanism only. Durable
 coordination remains GitHub Issues/PRs + tracked `/memory/**` engrams.
+
+### Recommended minimum fields
+
+To keep restart/resume behavior predictable across the swarm, `STATE.json`
+SHOULD include (at minimum):
+
+- `schema_version`
+- `created_at`, `updated_at`
+- `active_release` (when applicable): `{release_id, release_branch, release_pr_number}`
+- `last_seen`: `{main_sha, catalog_hash, image_tag}`
+- `director` (in the main worktree): `{run_id, last_heartbeat_at}`
+- `worker` (in worker worktrees): `{worker_id, issue_number, branch_name, stage, attempt}`
+
+Normative guidance and an example JSON are defined in:
+
+- `docs/specs/components/StateFile.md`
 
 ## Release model (dev harness)
 
@@ -179,10 +204,19 @@ converge on the latest harness/protocol changes.
 
 Workers communicate using stable JSON DTOs (schemas specified in planning issues/specs). At minimum:
 
-- `hello` — identity, task, container/worktree metadata
+- `protocol_hello` — identity, capabilities, and repo/worktree metadata
 - `heartbeat` — progress stage + timestamps (used for TTL detection)
-- `error_report` — structured error DTO (used for retry vs escalate)
-- `task_done` — completion summary + pointers to audit bundle
+- `worker_error` — structured error DTO (used for retry vs escalate)
+- `project_state_snapshot` — Director-emitted snapshot for operator UI clients
+
+Error classification, retry/backoff guidance, and the canonical error DTO fields
+are documented in:
+
+- `docs/dev/ERROR_HANDLING.md`
+
+Normative envelope framing and DTO field requirements live in:
+
+- `docs/specs/systems/AgentBusSystem.md`
 
 The Director maintains `SwarmState` (active workers + queue + health) and can periodically emit a `ProjectState` snapshot for the UI.
 

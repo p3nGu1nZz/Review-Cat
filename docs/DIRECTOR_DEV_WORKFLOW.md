@@ -24,6 +24,10 @@ other continuously.
 > [COPILOT_CLI_CHALLENGE_DESIGN.md](COPILOT_CLI_CHALLENGE_DESIGN.md) for full
 > design context.
 
+Reliability policy (retries, recovery, escalation) is documented in:
+
+- `docs/dev/ERROR_HANDLING.md`
+
 The key intent is not full autonomy. The intent is:
 
 - consistent decomposition
@@ -39,6 +43,10 @@ Every checkout (main worktree and worker worktrees) may contain a gitignored
 `STATE.json` at repo root. The Director and workers create it lazily if absent.
 It stores **local cached state** (first-run vs resume, current release context,
 last-seen SHAs/hashes). It is never committed.
+
+Recommended minimum fields + an example JSON are specified in:
+
+- `docs/specs/components/StateFile.md`
 
 ## Roles
 
@@ -162,6 +170,8 @@ render a live task graph and provide operator controls (start/stop/pause).
 4. **Sync context** — Before final validation/PR readiness, bring the worker branch up to date with `main` (Director policy):
   - this pulls in updated specs/protocols
   - this pulls in newly merged engrams under `/memory/` (durable shared memory)
+
+  The Director can enforce this using drift thresholds from `config/dev.toml` (`[policy.sync_main]`) and agent-bus messages like `sync_required` / `protocol_incompatibility` (see `docs/specs/systems/AgentBusSystem.md`).
 5. **Validate** — `./scripts/build.sh && ./scripts/test.sh`.
 6. **Create PR** — Via GitHub MCP targeting the active release branch and using
    `Refs #<issue>` (the release PR is what closes issues on merge to `main`).

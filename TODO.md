@@ -251,6 +251,8 @@ With them, you have a self-driving development daemon.
   - [ ] List active worktrees
   - [ ] For each: check if agent process is still running
   - [ ] Track worker container state + heartbeat TTL (via agent bus + docker state)
+  - [ ] Consume WorkerState heartbeats and structured error reports as defined in `docs/specs/systems/AgentBusSystem.md`
+  - [ ] Apply retry/recovery/escalation policy from `docs/dev/ERROR_HANDLING.md`
   - [ ] For completed workers: validate build/test passed
   - [ ] For passing workers: merge PR **into active release branch** via MCP, teardown worktree
   - [ ] Close issues only when the **release PR** (feature/* → main) is merged (or close explicitly as part of release finalization)

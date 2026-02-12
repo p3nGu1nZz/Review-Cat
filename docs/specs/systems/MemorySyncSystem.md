@@ -110,6 +110,14 @@ Workers should ingest changes that affect protocols/specs/memory:
 - before declaring a task “ready”, worker updates its PR branch with the latest `main`.
 - this pulls in newly merged engrams under `/memory/`.
 
+Drift detection is enforced by the Director using worker heartbeat fields such as:
+
+- `main_ancestor_sha`
+- `catalog_hash_seen`
+
+and agent-bus control messages such as `sync_required` / `protocol_incompatibility`
+(see `docs/specs/systems/AgentBusSystem.md`).
+
 ## Interfaces
 
 ### Inputs

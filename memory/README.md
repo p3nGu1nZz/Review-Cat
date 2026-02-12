@@ -55,6 +55,7 @@ memory/
 - Engrams should be treated as **append-only** once merged (prefer new versions over edits).
 - The Director maintains an authoritative **engram catalog (LUT)** mapping ids → hashes/paths/versions.
 - Workers should stay in sync with `main` to pull the latest engrams into their worktrees.
+	- In the dev harness, the Director detects drift via worker heartbeats (e.g., `catalog_hash_seen`) and can require sync via agent-bus messages (see `docs/specs/systems/AgentBusSystem.md`).
 
 See:
 - `AGENT.md` (memory model)

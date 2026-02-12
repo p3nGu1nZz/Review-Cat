@@ -54,6 +54,27 @@ listen_port = 8731
 # - mTLS: required before enabling multi-host/LAN mode.
 security = "docker_network_only" # docker_network_only | mTLS
 
+# Hard caps to keep telemetry bounded.
+max_message_bytes = 65536
+
+# Worker heartbeat frequency (Director enforces TTL separately).
+heartbeat_interval_seconds = 15
+
+[policy.sync_main]
+# Drift-prevention policy: when workers must sync their branch with latest `main`.
+#
+# These thresholds are used by the Director to decide when to send `sync_required`
+# and/or `protocol_incompatibility` messages over the agent bus.
+
+# If a worker is behind main by more than this many commits, require sync.
+max_commits_behind = 20
+
+# If a worker has not ingested main in this many seconds, require sync.
+max_seconds_behind = 86400
+
+# If true, any memory catalog hash mismatch forces sync (pull in new engrams).
+require_catalog_hash_match = true
+
 [memory]
 # MEMORY.md is a *tracked, shared focus view* derived from higher-signal context.
 # Durable shared memory is stored as versioned engrams under /memory/.

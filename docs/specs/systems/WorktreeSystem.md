@@ -68,6 +68,10 @@ checkout (main worktree or worker worktrees).
 Worktree teardown implicitly removes `STATE.json` because the directory is
 removed.
 
+Recommended minimum fields for `STATE.json` are defined in:
+
+- `docs/specs/components/StateFile.md`
+
 ## Test cases
 
 - Create and teardown a worktree.

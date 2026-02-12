@@ -586,6 +586,14 @@ Director (hub-and-spoke MVP). This enables:
 
 All timings and ports live in `config/dev.toml` (see Issue #5).
 
+Normative message framing and DTO field requirements live in:
+
+- `docs/specs/systems/AgentBusSystem.md`
+
+Retry/recovery policy and the canonical structured error DTO are documented in:
+
+- `docs/dev/ERROR_HANDLING.md`
+
 **Label taxonomy for agent coordination:**
 
 | Label | Meaning |

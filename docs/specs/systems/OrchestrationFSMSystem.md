@@ -174,4 +174,5 @@ Safe point definition (MVP):
 ## References
 
 - `docs/specs/systems/RequestBudgetSystem.md`
+- `docs/specs/systems/AgentBusSystem.md` (WorkerState heartbeats + error DTOs)
 - `config/dev.toml` (timeouts, retry, rate limits)

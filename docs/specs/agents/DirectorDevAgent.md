@@ -16,6 +16,16 @@ This is intended to be implemented using Copilot CLI custom agents and a thin or
 6. Must use gitignored `STATE.json` for local cached state (first-run vs resume; active release context).
 7. Must enforce the **issue-claim lock protocol** (Director-only claiming; label transitions + claim comments).
 
+8. Must maintain a worker registry and enforce telemetry invariants:
+  - workers must send periodic heartbeats (TTL enforced)
+  - workers must report stage/progress and structured errors
+  - stale/disconnected workers must be recovered (bounded retries) or escalated
+
+9. Must enforce drift-prevention sync policy:
+  - workers must ingest the latest `main` before PR readiness
+  - memory catalog hash mismatches may trigger required sync
+  - enforcement thresholds come from `config/dev.toml` (`[policy.sync_main]`)
+
 Canonical label taxonomy and claim-comment format: `docs/dev/GITHUB_LABELS.md`.
 
 ## Interfaces
@@ -57,4 +67,5 @@ prompt files, invoked via `copilot -p @dev/agents/<role>.md "..."`.
 
 - `docs/specs/systems/ReleaseCycleSystem.md`
 - `docs/specs/systems/OrchestrationFSMSystem.md`
+- `docs/specs/systems/AgentBusSystem.md`
 - `AGENT.md` (swarm contract)
