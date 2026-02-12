@@ -23,6 +23,8 @@ GitHub MCP Server configured for issue/PR operations.
   - if release cycles are disabled and the PR targets `main` directly, the PR MAY use `Closes #<issue>`
 8. Must add the `agent-review` label to the PR to trigger code-review.
 9. Must record all Copilot CLI interactions in the prompt ledger.
+10. Must be non-interactive: no local prompts for clarification; if issue context
+  is insufficient, ask via GitHub issue comment and apply `agent-blocked`.
 
 ## Interfaces
 

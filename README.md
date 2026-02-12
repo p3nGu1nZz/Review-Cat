@@ -77,11 +77,11 @@ Review-Cat/
 │   └── audits/             # Development audit bundles
 │
 ├── docs/                   # Design docs & specifications
-│   ├── specs/              # Component, entity, system, agent specs
-│   ├── COPILOT_CLI_CHALLENGE_DESIGN.md
-│   ├── DIRECTOR_DEV_WORKFLOW.md
-│   ├── IMPLEMENTATION_CHECKLIST.md
-│   └── PROMPT_COOKBOOK.md
+│   ├── INDEX.md            # Documentation landing page
+│   ├── ARCHITECTURE.md     # High-level architecture overview
+│   ├── dev/                # Dev harness docs
+│   ├── app/                # Runtime app docs
+│   └── specs/              # Legacy monolithic spec tree (migration in progress)
 │
 ├── scripts/                # Top-level build/test/clean scripts
 ├── config/                 # Dev harness config (e.g., config/dev.toml)
@@ -189,23 +189,23 @@ validates via build + test, and commits. See [PLAN.md](PLAN.md) §5 for details.
 | [PLAN.md](PLAN.md) | Comprehensive project plan (golden source of truth) |
 | [TODO.md](TODO.md) | Actionable task list by phase |
 | [AGENT.md](AGENT.md) | Agent system overview: roles, guardrails, agent bus, memory protocol |
-| [Design Doc](docs/COPILOT_CLI_CHALLENGE_DESIGN.md) | Architecture, UX, integration design |
-| [Director Workflow](docs/DIRECTOR_DEV_WORKFLOW.md) | DirectorDev recursive development spec |
-| [Implementation Checklist](docs/IMPLEMENTATION_CHECKLIST.md) | Step-by-step checklist |
-| [Prompt Cookbook](docs/PROMPT_COOKBOOK.md) | Curated prompt patterns |
-| [Specs](docs/specs/) | Component, entity, system, agent specifications |
+| [Docs Index](docs/INDEX.md) | Documentation landing page (dev vs app) |
+| [Design Doc](docs/dev/COPILOT_CLI_CHALLENGE_DESIGN.md) | Architecture, UX, integration design |
+| [Director Workflow](docs/dev/DIRECTOR_DEV_WORKFLOW.md) | DirectorDev recursive development spec |
+| [Implementation Checklist](docs/dev/IMPLEMENTATION_CHECKLIST.md) | Step-by-step checklist |
+| [Prompt Cookbook](docs/dev/PROMPT_COOKBOOK.md) | Curated prompt patterns |
+| [Specs (Dev)](docs/dev/specs/SPECS.md) | Dev harness agent + orchestration specifications |
+| [Specs (App)](docs/app/specs/SPECS.md) | Runtime app component/entity/system specifications |
 
 ## Specs
 
-All specs live under `docs/specs/`:
+Specs are split by concern:
 
-- `docs/specs/components/` — Pure data structures
-- `docs/specs/entities/` — Factories and construction rules
-- `docs/specs/systems/` — Modules with logic and side-effects
-- `docs/specs/agents/` — Copilot CLI custom agents and role workflows
+- Dev harness specs index: `docs/dev/specs/SPECS.md`
+- Runtime app specs index: `docs/app/specs/SPECS.md`
 
-Development is spec-first: update or add a spec, then implement to match
-acceptance criteria.
+During migration, many specs still live physically under `docs/specs/`.
+Use the indices above for navigation.
 
 ## License
 

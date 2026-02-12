@@ -104,6 +104,6 @@ Related:
 
 ## Related docs/specs
 
-- `docs/DIRECTOR_DEV_WORKFLOW.md`
+- `docs/dev/DIRECTOR_DEV_WORKFLOW.md`
 - `docs/specs/systems/WorktreeSystem.md`
 - `docs/specs/agents/DirectorDevAgent.md`

@@ -1,8 +1,9 @@
 # ReviewCat: Comprehensive Project Plan
 
 > **Golden Source of Truth** — This document, together with `TODO.md` and the
-> specs under `docs/specs/`, defines what ReviewCat is, how it is built, and how
-> it operates at runtime. All implementation must trace back to these docs.
+> the specs (see `docs/dev/specs/` and `docs/app/specs/`) defines what ReviewCat
+> is, how it is built, and how it operates at runtime. All implementation must
+> trace back to these docs.
 
 ## Status (repo reality check)
 
@@ -106,11 +107,15 @@ Review-Cat/
 │   └── agents/             # Copilot CLI custom agent definitions
 │
 ├── docs/                   # Design docs and specifications (golden source)
-│   ├── specs/              # Component, entity, system, agent specs
-│   ├── COPILOT_CLI_CHALLENGE_DESIGN.md
-│   ├── DIRECTOR_DEV_WORKFLOW.md
-│   ├── IMPLEMENTATION_CHECKLIST.md
-│   └── PROMPT_COOKBOOK.md
+│   ├── INDEX.md            # Docs landing page (dev vs app)
+│   ├── ARCHITECTURE.md     # High-level architecture overview
+│   ├── dev/                # Dev harness docs + specs
+│   ├── app/                # Runtime app docs + specs
+│   ├── specs/              # Legacy monolithic spec tree (migration in progress)
+│   ├── COPILOT_CLI_CHALLENGE_DESIGN.md  # Legacy redirect stub → docs/dev/
+│   ├── DIRECTOR_DEV_WORKFLOW.md         # Legacy redirect stub → docs/dev/
+│   ├── IMPLEMENTATION_CHECKLIST.md      # Legacy redirect stub → docs/dev/
+│   └── PROMPT_COOKBOOK.md               # Legacy redirect stub → docs/dev/
 │
 ├── scripts/                # Top-level convenience scripts
 │   ├── build.sh            # Build the app
@@ -593,7 +598,7 @@ All timings and ports live in `config/dev.toml` (see Issue #5).
 
 Normative message framing and DTO field requirements live in:
 
-- `docs/specs/systems/AgentBusSystem.md`
+- `docs/dev/specs/SPECS.md` (see `AgentBusSystem`)
 
 Retry/recovery policy and the canonical structured error DTO are documented in:
 
@@ -644,7 +649,8 @@ cd Review-Cat
 #   - Installs jq (if missing)
 #   - Downloads github-mcp-server binary from GitHub Releases (if missing)
 #   - Verifies: copilot, gh, jq, cmake, g++, github-mcp-server
-#   - Prompts for GITHUB_PERSONAL_ACCESS_TOKEN if unset
+#   - Requires GITHUB_PERSONAL_ACCESS_TOKEN via environment (non-interactive).
+#     If unset, exit with a clear message rather than prompting.
 #   - Runs gh auth login if not authenticated
 #   - All installs are idempotent — safe to re-run
 
@@ -693,7 +699,7 @@ A native window built with **SDL3** (window/input) and a **custom ToolUI** (draw
 - **Agent Personas** — Enable/disable personas, adjust severity thresholds.
 - **Audit Log** — Browse past review runs and their artifacts.
 - **Log Viewer** — Live scrolling log output with level filtering (ToolUI text rendering).
-- **Controls** — Start/stop daemon, trigger manual review, open audit directory.
+- **Controls** — Start/stop daemon, trigger on-demand review, open audit directory.
 
 Optionally, the UI can expose a **swarm visualizer** mode intended for the
 dev harness: it connects to the agent bus (socket pub/sub) and renders a live
@@ -765,7 +771,8 @@ repository.
 
 All development follows the spec-first pattern:
 
-1. Write or update a spec in `docs/specs/`.
+1. Write or update a spec under `docs/dev/specs/` (dev harness) or `docs/app/specs/` (runtime app).
+  (Legacy specs may still live physically under `docs/specs/` during migration.)
 2. Director creates a GitHub Issue linking the spec.
 3. Director assigns the issue to a coding agent in a worktree.
 4. Agent implements, tests, and documents.

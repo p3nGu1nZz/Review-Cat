@@ -112,4 +112,4 @@ Recommended minimum fields for `STATE.json` are defined in:
 See:
 
 - `docs/specs/agents/DirectorDevAgent.md`
-- `docs/DIRECTOR_DEV_WORKFLOW.md`
+- `docs/dev/DIRECTOR_DEV_WORKFLOW.md`

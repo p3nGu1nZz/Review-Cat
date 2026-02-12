@@ -18,6 +18,9 @@ through it can access GitHub tools (issues, PRs, comments) natively.
 5. Must enforce tool allow/deny policy.
 6. Must support `--mcp-config` for GitHub MCP Server integration.
 7. Must support agent profile references (`@dev/agents/<role>.md`).
+8. Must be non-interactive: if Copilot CLI requests interactive input (trust
+	confirmations, auth flows), the call must fail fast with a clear error so the
+	Director can escalate via `agent-blocked`.
 
 ## Interfaces
 

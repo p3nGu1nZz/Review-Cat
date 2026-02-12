@@ -10,6 +10,9 @@ self-improvement loop.
 This system is invoked by the Director daemon when no other work is available,
 or on a configurable schedule.
 
+Self-review is intended to run **unattended** as part of the zero-touch loop;
+it should not require interactive prompts.
+
 ## Requirements
 
 1. Must generate a diff of recent changes (e.g., `HEAD~5..HEAD` or full codebase).

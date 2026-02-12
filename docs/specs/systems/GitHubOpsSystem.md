@@ -25,6 +25,11 @@ This system serves two distinct contexts:
 9. Must respect swarm-level backpressure and rate-limit policy (see `RequestBudgetSystem`).
 10. Must support the Director’s **issue-claim lock protocol** (label transitions + claim comment).
 
+11. Must be non-interactive:
+  - enablement MUST be configuration-driven (no prompts)
+  - missing/expired credentials MUST fail fast with a clear remediation
+    (and in the dev-harness context, should trigger `agent-blocked` escalation)
+
 Canonical label taxonomy and claim-comment format: `docs/dev/GITHUB_LABELS.md`.
 
 ## Interfaces
@@ -88,6 +93,7 @@ These operations are conceptually higher-level; they are implemented using the p
 - Rate limiting from GitHub API (including burst/abuse protection).
 - GitHub MCP Server timeout.
 - Token expired or insufficient permissions.
+- GitHub auth missing in zero-touch mode (must not block on prompts; escalate).
 
 ## Related specs
 

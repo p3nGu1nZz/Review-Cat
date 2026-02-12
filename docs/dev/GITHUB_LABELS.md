@@ -161,7 +161,7 @@ To avoid two Directors competing, optionally use a dedicated “director lock”
 ## Cross-references
 
 - `PLAN.md` (coordination model and release cycles)
-- `docs/DIRECTOR_DEV_WORKFLOW.md` (operational sequence)
+- `docs/dev/DIRECTOR_DEV_WORKFLOW.md` (operational sequence)
 - `docs/specs/systems/GitHubOpsSystem.md` (API operations)
 - Issue #10 (this document)
 - Issue #11 (claim locks)
